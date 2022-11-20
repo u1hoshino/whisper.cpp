@@ -1,9 +1,16 @@
 name: CI
 on: [push]
+# name: CI
+# on: [workflow_dispatch]
 
 jobs:
     windows:
         runs-on: windows-latest
+
+        strategy:
+            matrix:
+                arch: ["Win32", "x64"]
+
         steps:
             - name: Clone
               uses: actions/checkout@v1
@@ -13,19 +20,18 @@ jobs:
 
             - name: CMake
               shell: powershell
-              run: cmake -S . -B ./build
+              run: cmake -S . -B ./build_${{matrix.arch}} -A ${{matrix.arch}} -DCMAKE_BUILD_TYPE=Release
 
             - name: MSBuild
               run: |
-                cd ./build
-                msbuild INSTALL.vcxproj /t:build
-            
-            - name: Upload artifacts
-              uses: actions/upload-artifact@v3.1.1
+                cd ./build_${{matrix.arch}}
+                msbuild INSTALL.vcxproj /t:build /p:configuration=Release /p:platform=${{matrix.arch}} -maxcpucount
+            - name: Upload binaries
+              uses: actions/upload-artifact@v1
               with:
-                name: artifacts_win-${{matrix.arch}}
-                path: build_win_${{matrix.arch}}/install
-          
+                name: whisper-bin-${{matrix.arch}}
+                path: build_${{matrix.arch}}/bin/Release
+
 #     ubuntu-latest:
 #         runs-on: ubuntu-latest
 
