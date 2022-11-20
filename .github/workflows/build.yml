@@ -1,7 +1,25 @@
-# name: CI
-# on: [push]
+name: CI
+on: [push]
 
-# jobs:
+jobs:
+    windows:
+        runs-on: windows-latest
+        steps:
+            - name: Clone
+              uses: actions/checkout@v1
+
+            - name: Add msbuild to PATH
+              uses: microsoft/setup-msbuild@v1
+
+            - name: CMake
+              shell: powershell
+              run: cmake -S . -B ./build
+
+            - name: MSBuild
+              run: |
+                cd ./build
+                msbuild INSTALL.vcxproj /t:build
+
 #     ubuntu-latest:
 #         runs-on: ubuntu-latest
 
