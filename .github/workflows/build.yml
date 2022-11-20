@@ -19,7 +19,13 @@ jobs:
               run: |
                 cd ./build
                 msbuild INSTALL.vcxproj /t:build
-
+            
+            - name: Upload artifacts
+              uses: actions/upload-artifact@v3.1.1
+              with:
+                name: artifacts_win-${{matrix.arch}}
+                path: build_win_${{matrix.arch}}/install
+          
 #     ubuntu-latest:
 #         runs-on: ubuntu-latest
 
